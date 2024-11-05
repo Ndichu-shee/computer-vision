@@ -2,28 +2,45 @@ import numpy as np
 import cv2
 from scipy.stats import zscore
 
+
 def check_dimensional_consistency(image, expected_shape=(28, 28)):
     return image.shape == expected_shape
 
+
 def apply_gaussian_filter(image):
-    image = (image * 255).astype(np.uint8) if image.max() <= 1 else image.astype(np.uint8)
+    image = (
+        (image * 255).astype(np.uint8) if image.max() <= 1 else image.astype(np.uint8)
+    )
     return cv2.GaussianBlur(image.reshape(28, 28), (5, 5), 0)
 
+
 def apply_median_filter(image):
-    image = (image * 255).astype(np.uint8) if image.max() <= 1 else image.astype(np.uint8)
+    image = (
+        (image * 255).astype(np.uint8) if image.max() <= 1 else image.astype(np.uint8)
+    )
     return cv2.medianBlur(image.reshape(28, 28), 5)
 
+
 def improved_binarization(image):
-    image = (image * 255).astype(np.uint8) if image.max() <= 1 else image.astype(np.uint8)
-    return cv2.adaptiveThreshold(image.reshape(28, 28), 255,
-                                 cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                 cv2.THRESH_BINARY, 11, 2)
+    image = (
+        (image * 255).astype(np.uint8) if image.max() <= 1 else image.astype(np.uint8)
+    )
+    return cv2.adaptiveThreshold(
+        image.reshape(28, 28),
+        255,
+        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv2.THRESH_BINARY,
+        11,
+        2,
+    )
+
 
 def standardize_image(image):
     mean = np.mean(image)
     std = np.std(image)
     standardized_image = (image - mean) / std
     return standardized_image
+
 
 # Full preprocessing pipeline
 def pre_process_image(image):
