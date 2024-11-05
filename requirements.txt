@@ -1,0 +1,10 @@
+Flask==2.3.2
+scikit-learn==1.5.1
+numpy-1.26.4        # Compatible version to avoid conflicts
+opencv-python==4.8.0.74  # OpenCV version that works with NumPy 1.24.3
+scipy==1.11.2          # SciPy version compatible with NumPy 1.24.3
+tensorflow==2.18.0     # Specify TensorFlow version if you need it
+keras==3.6.0          # Keras version; ensure compatibility with TensorFlow
+matplotlib==3.7.2      # Visualization library
+pandas==1.5.3          # Data analysis library
+# Add other dependencies as needed
