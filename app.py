@@ -1,4 +1,4 @@
-app.pyfrom flask import Flask, request, jsonify
+from flask import Flask, request, jsonify
 import numpy as np
 import tensorflow as tf
 import pickle
@@ -136,4 +136,4 @@ def predict():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=7070)
+    app.run(debug=True, port=9090)
