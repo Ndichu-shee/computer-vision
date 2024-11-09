@@ -3,6 +3,7 @@ import numpy as np
 import tensorflow as tf
 import pickle
 import cv2
+from sklearn.impute import SimpleImputer
 from utils import process_image
 import os
 
@@ -70,20 +71,25 @@ def predict():
         try:
             # Preprocess the image
             processed_image = process_image(image)
+
+            # Ensure no NaNs in the processed image
+            if np.any(np.isnan(processed_image)):
+                raise ValueError("Processed image contains NaN values")
+            
+            # Impute missing values if necessary
+            imputer = SimpleImputer(strategy='mean')
+            processed_image_flat_imputed = imputer.fit_transform(processed_image.flatten().reshape(1, -1))
+
+            # Apply PCA transformation
+            processed_image_pca = pca.transform(processed_image_flat_imputed)
+            
             save_processed_image(processed_image, 'processed_image.png')
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
 
         # Flattened and 4D images for different model requirements
-        processed_image_flat = processed_image.flatten().reshape(
-            1, -1
-        )  # For MLP and traditional ML models
+        processed_image_flat = processed_image.flatten().reshape(1, -1)  # For MLP and traditional ML models
         processed_image_4d = processed_image.reshape(1, 28, 28, 1)  # For CNN model
-
-        # Apply PCA transformation for non-CNN models
-        processed_image_pca = pca.transform(
-            processed_image_flat
-        )  # Transform to 50 features
 
         predictions = {}
 
