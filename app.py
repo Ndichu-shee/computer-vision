@@ -1,9 +1,10 @@
-from flask import Flask, request, jsonify
+app.pyfrom flask import Flask, request, jsonify
 import numpy as np
 import tensorflow as tf
 import pickle
 import cv2
-from utils import pre_process_image
+from utils import process_image
+import os
 
 app = Flask(__name__)
 
@@ -12,7 +13,7 @@ cnn_model = tf.keras.models.load_model("models/cnn_model.h5")
 mlp_model = tf.keras.models.load_model("models/mlp_model.h5")
 
 # Load pickled models
-with open("models/log_reg_model.pkl", "rb") as file:
+with open("models/logistic_regression_model.pkl", "rb") as file:
     log_reg_model = pickle.load(file)
 
 with open("models/svm_model.pkl", "rb") as file:
@@ -22,7 +23,7 @@ with open("models/knn_model.pkl", "rb") as file:
     knn_model = pickle.load(file)
 
 # Load PCA for dimensionality reduction
-with open("models/pca_transform.pkl", "rb") as file:
+with open("models/pca_model.pkl", "rb") as file:
     pca = pickle.load(file)
 
 # Model dictionary for prediction routing
@@ -33,6 +34,26 @@ models = {
     "svm": svm_model,
     "knn": knn_model,
 }
+
+if not os.path.exists('images'):
+    os.makedirs('images')
+
+# Function to save processed image
+def save_processed_image(image, filename='processed_image.png'):
+    """
+    Save the processed image to the 'images/' folder.
+
+    Parameters:
+    - image: The image to be saved.
+    - filename: The name of the file to save the image as.
+    """
+    # Normalize the image to [0, 255] range if it's float
+    if image.max() <= 1.0:
+        image = (image * 255).astype(np.uint8)
+    
+    # Save the image
+    image_path = os.path.join('images', filename)
+    cv2.imwrite(image_path, image)
 
 
 @app.route("/predict", methods=["POST", "GET"])
@@ -48,7 +69,8 @@ def predict():
 
         try:
             # Preprocess the image
-            processed_image = pre_process_image(image)
+            processed_image = process_image(image)
+            save_processed_image(processed_image, 'processed_image.png')
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
 
@@ -110,7 +132,7 @@ def predict():
             {"all_predictions": predictions, "best_prediction": best_prediction}
         )
     else:
-        return jsonify("Welcome to Alkeema Image Classifcation API")
+        return jsonify("Welcome to Alkeema Image Classification API")
 
 
 if __name__ == "__main__":
