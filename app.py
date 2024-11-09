@@ -132,7 +132,7 @@ def predict():
             {"all_predictions": predictions, "best_prediction": best_prediction}
         )
     else:
-        return jsonify("Welcome to Alkeema Image Classification API")
+        return jsonify("Welcome to Alkeema Image Classification API!!!")
 
 
 if __name__ == "__main__":
